@@ -1,7 +1,6 @@
 package com.generate.animation.videos.service;
 
 import com.generate.animation.videos.dtos.VideoRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,7 @@ import java.io.FileWriter;
 import java.util.Arrays;
 
 @Service
-public class VideoService {
+public class VideoServiceMultiImage {
 
     @Value("${video.duration}")
     private int duration;
@@ -51,22 +50,33 @@ public class VideoService {
             ProcessBuilder pb = new ProcessBuilder(
                     "ffmpeg",
                     "-y",
+
                     "-loop", "1",
                     "-i", img.getAbsolutePath(),
+
                     "-vf",
-                    "scale=3000:5333:force_original_aspect_ratio=increase," +
-                            "zoompan=z='min(zoom+0.0012,1.25)':" +
-                            "x='iw/2-(iw/zoom/2)':" +
-                            "y='ih/2-(ih/zoom/2)':" +
-                            "d=" + totalFrames + ":s=2160x3840:fps=30",
+                    "scale=3000:5333:force_original_aspect_ratio=increase:flags=lanczos," +
+                            "crop=2160:3840," +
+
+                            // FAST ANIMATION (KEY CHANGE HERE)
+                            "zoompan=" +
+                            "z='1+0.12*sin(0.03*on)':" +              // faster zoom pulses
+                            "x='iw/2-(iw/zoom/2)+60*sin(on/20)':" +   // faster horizontal motion
+                            "y='ih/2-(ih/zoom/2)+40*cos(on/25)':" +   // faster vertical motion
+                            "d=" + totalFrames + ":s=2160x3840:fps=30," +
+
+                            "format=yuv420p",
 
                     "-t", String.valueOf(duration),
+
                     "-c:v", "libx264",
                     "-preset", "slow",
                     "-crf", "18",
+
                     "-pix_fmt", "yuv420p",
                     "-r", "30",
                     "-movflags", "+faststart",
+
                     outputVideo
             );
             pb.inheritIO();

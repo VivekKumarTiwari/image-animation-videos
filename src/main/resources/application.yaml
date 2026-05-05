@@ -7,11 +7,11 @@ spring:
       api-key: sk-local
 server:
   port: 9080
-video:
-  input:
-    path: /data/images/
-  output:
-    path: /data/output/
-  duration: 8
+#video:
+#  input:
+#    path: /data/images/
+#  output:
+#    path: /data/output/
+#  duration: 8
 
 
